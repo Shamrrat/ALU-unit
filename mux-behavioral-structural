@@ -1,22 +1,35 @@
-`timescale 1ns/1ps
-module mux4to1 (in,sel,out);
-input [3:0]in;
-input[1:0] sel;
-output out;
-assign out=in[sel];
+Behavioral 4-to-1 MUX
+`timescale 1ns/1ps   // Time unit = 1ns, time precision = 1ps
+
+module mux4to1 (in, sel, out);
+    input  [3:0] in;   // 4-bit input (4 single-bit signals)
+    input  [1:0] sel;  // 2-bit select line
+    output out;        // Output signal
+
+    // Selects one bit from 'in' based on 'sel' value
+    assign out = in[sel];
 endmodule
-`timescale 1ns/1ps
-module strucmux16to1(in,sel,out);
-input [15:0]in;
-input [3:0]sel;
-output out;
-wire [3:0]t;
-mux4to1 M0 (in[3:0],sel[1:0],t[0]);
-mux4to1 M1 (in[7:4],sel[1:0],t[1]);
-mux4to1 M2 (in[5:8],sel[1:0],t[2]);
-mux4to1 M3 (in[15:12],sel[1:0],t[3]);
-mux4to1 M4 (t,sel[3:2],out);
-endmodulemodule strucmux16to1_tb;
+
+Structural 16-to-1 MUX 
+`timescale 1ns/1ps   // Time unit = 1ns, precision = 1ps
+
+module strucmux16to1 (in, sel, out);
+    input  [15:0] in;   // 16-bit input (16 single-bit signals)
+    input  [3:0]  sel;  // 4-bit select line
+    output out;         // Output signal
+    wire   [3:0]  t;    // Intermediate outputs from first stage
+
+    // First stage: 4 muxes select 4 outputs from 16 inputs
+    mux4to1 M0 (in[3:0],    sel[1:0], t[0]);
+    mux4to1 M1 (in[7:4],    sel[1:0], t[1]);
+    mux4to1 M2 (in[11:8],   sel[1:0], t[2]); // fixed index
+    mux4to1 M3 (in[15:12],  sel[1:0], t[3]);
+
+    // Second stage: 1 mux selects final output from 4 intermediate values
+    mux4to1 M4 (t, sel[3:2], out);
+endmodule
+Testbench for Structural 16-to-1 MUX 
+module strucmux16to1_tb;
     reg  [15:0] in;
     reg  [3:0]  sel;
     wire out;
