@@ -1,0 +1,31 @@
+Adder with flags
+module adder (x, y, z, carry, zero, parity, overflow);
+    input [15:0] x, y;
+    output [15:0] z;
+    output carry, zero, parity, overflow;
+
+    assign {carry, z} = x + y;                  // 16-bit addition with carry
+    assign zero = ~|z;                          // Zero flag
+    assign parity = ~^z;                        // Parity flag (even parity)
+    assign overflow = (x[15] == y[15]) && (z[15] != x[15]); // Overflow flag
+endmodule
+Testbench for adder with flags
+module addertb;
+    reg [15:0] x, y;
+    wire [15:0] z;
+    wire carry, parity, zero, overflow;
+
+    // Instantiate the DUT (Device Under Test)
+    adder dut (x, y, z, carry, zero, parity, overflow);
+
+    initial begin
+        $monitor($time, " x=%h y=%h z=%h carry=%b parity=%b zero=%b overflow=%b",
+                 x, y, z, carry, parity, zero, overflow);
+
+        #5 x = 16'h34ea; y = 16'h12aa;
+        #5 y = 16'h0000;
+        #5 x = 16'h0000;
+        #5 x = 16'hffff; y = 16'h0001;  // test carry
+        #5 $finish;
+    end
+endmodule
