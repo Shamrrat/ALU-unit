@@ -15,3 +15,38 @@ always @(*) begin
 end
 
 endmodule
+// testbench for ALU
+module tb_simple_alu;
+
+reg [3:0] a, b;
+reg [1:0] sel;
+wire [3:0] result;
+
+// Instantiate ALU
+simple_alu uut (
+    .a(a),
+    .b(b),
+    .sel(sel),
+    .result(result)
+);
+
+initial begin
+    // Monitor signals
+    $monitor("a=%d b=%d sel=%b -> result=%d", a, b, sel, result);
+
+    // Test Addition
+    a = 4'd5; b = 4'd3; sel = 2'b00; #10;
+
+    // Test Subtraction
+    a = 4'd7; b = 4'd2; sel = 2'b01; #10;
+
+    // Test AND
+    a = 4'b1100; b = 4'b1010; sel = 2'b10; #10;
+
+    // Test OR
+    a = 4'b1100; b = 4'b1010; sel = 2'b11; #10;
+
+    $finish;
+end
+
+endmodule
