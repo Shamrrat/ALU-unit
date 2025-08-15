@@ -1,15 +1,20 @@
-# ALU-unit
-This project implements a Simple 4-bit ALU (Arithmetic Logic Unit) in Verilog along with a basic testbench for simulation. The ALU performs four fundamental operations based on a 2-bit select line.
-This testbench verifies the functionality of the simple_alu module. It provides sample inputs and checks the output for different operations:
+VERILOG,SYSYTEM VERILOG and UVM
+# Digital Design & Verification Repository
 
-Addition (sel = 00)
+This repository contains my work in **Verilog**, **SystemVerilog**, and **UVM** for digital design and verification.
 
-Subtraction (sel = 01)
+## 📂 Contents
+- **Verilog** – RTL designs such as adders, multiplexers, counters, and more.
+- **SystemVerilog** – Enhanced designs and testbenches with advanced verification features.
+- **UVM** – Reusable, scalable verification environments following the Universal Verification Methodology.
 
-Bitwise AND (sel = 10)
+## 🛠 Tools Used
+- [Icarus Verilog](http://iverilog.icarus.com/) – Open-source Verilog/SystemVerilog simulator
+- [ModelSim / QuestaSim](https://eda.sw.siemens.com/en-US/ic/modelsim/) – Industry-standard simulation tool
+- [GTKWave](http://gtkwave.sourceforge.net/) – Waveform viewer
+- Any preferred text editor/IDE (VS Code, Sublime, Vim, etc.)
 
-Bitwise OR (sel = 11)
-
-The $monitor statement is used to display input and output values during simulation. After testing all operations, the simulation ends with $finish.
-
-This testbench helps confirm that the ALU behaves correctly under various inputs.
+## 🚀 How to Run
+1. **Compile RTL & Testbench**
+   ```bash
+   iverilog -o design.vvp design.v testbench.v
