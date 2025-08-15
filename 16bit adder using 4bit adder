@@ -1,0 +1,80 @@
+// 4-bit adder module
+module adder4bit (sum, cout, a, b, cin);
+    input  [3:0] a, b;
+    input        cin;
+    output [3:0] sum;
+    output       cout;
+
+    assign {cout, sum} = a + b + cin;
+endmodule
+// 16-bit adder made from four 4-bit adders
+module adder16bit (x, y, z, sign, zero, cout, parity, overflow);
+
+    input  [15:0] x, y;   // 16-bit inputs
+    output [15:0] z;      // 16-bit sum
+    output cout;          // Final carry out
+    output sign;          // Sign flag
+    output zero;          // Zero flag
+    output parity;        // Parity flag
+    output overflow;      // Overflow flag
+
+    wire [2:0] c;         // Carry wires between stages
+
+    // Flags
+    assign sign     = z[15];                     // MSB of result
+    assign parity   = ~^z;                       // Even parity
+    assign zero     = ~|z;                       // 1 if all bits are 0
+    assign overflow = (x[15] == y[15]) &&        // Same sign inputs
+                      (y[15] != z[15]);          // Different sign result
+
+    // 4-bit adder stages
+    adder4bit A0 (z[3:0],   c[0], x[3:0],   y[3:0],   1'b0);
+    adder4bit A1 (z[7:4],   c[1], x[7:4],   y[7:4],   c[0]);
+    adder4bit A2 (z[11:8],  c[2], x[11:8],  y[11:8],  c[1]);
+    adder4bit A3 (z[15:12], cout, x[15:12], y[15:12], c[2]);
+
+endmodule
+// testbench for 16 bit adder
+`timescale 1ns/1ps
+
+module tb_adder16bit;
+    reg  [15:0] x, y;
+    wire [15:0] z;
+    wire sign, zero, cout, parity, overflow;
+
+    // DUT instantiation
+    adder16bit uut (
+        .x(x),
+        .y(y),
+        .z(z),
+        .sign(sign),
+        .zero(zero),
+        .cout(cout),
+        .parity(parity),
+        .overflow(overflow)
+    );
+
+    initial begin
+        // For GTKWave
+        $dumpfile("dump.vcd");
+        $dumpvars(0, tb_adder16bit);
+
+        // Console monitor
+        $monitor("t=%0t | x=%0d y=%0d | z=%0d | cout=%b sign=%b zero=%b parity=%b overflow=%b",
+                 $time, x, y, z, cout, sign, zero, parity, overflow);
+
+        // Test cases
+        x = 16'd10;    y = 16'd5;     #10;  // simple add
+        x = 16'd100;   y = 16'd200;   #10;  // larger numbers
+        x = 16'h7FFF;  y = 16'h0001;  #10;  // positive overflow
+        x = 16'h8000;  y = 16'h8000;  #10;  // negative overflow
+        x = 16'd0;     y = 16'd0;     #10;  // zero result
+        x = 16'hAAAA;  y = 16'h5555;  #10;  // parity check
+
+        // Signed number tests
+        x = -16'sd50;  y = 16'sd25;   #10;  // negative + positive
+        x = -16'sd100; y = -16'sd30;  #10;  // negative + negative
+
+        $finish;
+    end
+endmodule
